@@ -1,0 +1,284 @@
+<!doctype html>
+<!--
+Big Bad Builder — Outdoor Living Estimator (Lite Public v0.9)
+Single-file, client-only, no dependencies.
+Purpose: keep quotes live while we rebuild/replace Netlify.
+NOTE: This is NOT v2.4.7 — it's a lightweight quick-quote.
+Last updated: 2025-10-24
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Big Bad Builder — Outdoor Living Estimator (Lite v0.9)</title>
+  <style>
+    :root{
+      --bg:#0b0f13; --panel:#121821; --edge:#283445; --ink:#e9eef3; --muted:#b9c7d6;
+      --accent:#2ea043; --accent2:#0ea5e9; --danger:#f43f5e;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:linear-gradient(180deg,#0a0f14,#0b0f13 60%); color:var(--ink);
+      font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    }
+    .bar{
+      position:sticky; top:0; z-index:10; backdrop-filter: blur(6px);
+      background:rgba(10,15,20,.75); border-bottom:1px solid var(--edge);
+    }
+    .bar .inner{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .logo{display:flex;gap:10px; align-items:center}
+    .tag{font-size:.78rem;border:1px solid var(--edge);padding:2px 8px;border-radius:999px;color:var(--muted)}
+    .wrap{max-width:1100px;margin:0 auto;padding:16px}
+    h1{font-size:1.25rem;margin:10px 0 6px}
+    .sub{color:var(--muted);font-size:.92rem;margin:0 0 10px}
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+    .card{background:var(--panel);border:1px solid var(--edge);border-radius:var(--radius);padding:16px;box-shadow:0 2px 22px rgba(0,0,0,.25)}
+    .card h2{font-size:1rem;margin:0 0 10px;color:var(--muted)}
+    .row{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+    .row3{display:grid;gap:12px;grid-template-columns:1fr 1fr 1fr}
+    label{display:block;margin:.25rem 0 .35rem;color:var(--muted);font-size:.9rem}
+    input,select,textarea{
+      width:100%;padding:.7rem .8rem;border-radius:12px;border:1px solid var(--edge);
+      background:#0e141b;color:var(--ink);outline:none;
+    }
+    input:focus,select:focus,textarea:focus{border-color:#3a4b61;box-shadow:0 0 0 3px rgba(14,165,233,.15)}
+    .btn{
+      display:inline-flex;gap:8px;align-items:center;justify-content:center;cursor:pointer;
+      padding:.8rem 1rem;border-radius:12px;border:1px solid var(--edge);background:#192231;color:#fff;
+      user-select:none;
+    }
+    .btn.primary{background:var(--accent);border-color:#1f7a31}
+    .btn.ghost{background:transparent}
+    .btn:active{transform:translateY(1px)}
+    .total{font-size:1.8rem;font-weight:800;margin:.25rem 0 .35rem}
+    .line{display:flex;justify-content:space-between;gap:10px;margin:.25rem 0;color:var(--muted)}
+    .hr{height:1px;background:var(--edge);margin:10px 0}
+    .foot{display:flex;gap:10px;flex-wrap:wrap}
+    .notice{font-size:.85rem;color:var(--muted)}
+    @media (max-width: 900px){ .grid{grid-template-columns:1fr} }
+  </style>
+</head>
+<body>
+  <!-- Top bar -->
+  <div class="bar">
+    <div class="inner">
+      <div class="logo">
+        <strong>Big Bad Builder</strong>
+        <span class="tag">Outdoor Living Estimator</span>
+        <span class="tag">Lite Public v0.9</span>
+        <span class="tag" title="Not the Netlify build you used before">NOT v2.4.7</span>
+      </div>
+      <button class="btn ghost" id="copyLinkBtn" title="Copy a link to this estimator">
+        Copy Link
+      </button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <h1>Instant Quick Quote</h1>
+    <p class="sub">Fast ballpark for decks, pergolas, and patios. Final pricing after site review.</p>
+
+    <div class="grid">
+      <!-- Inputs -->
+      <div class="card">
+        <h2>Project Details</h2>
+
+        <div class="row">
+          <div>
+            <label>Project Type</label>
+            <select id="projType">
+              <option value="deck">Deck</option>
+              <option value="pergola">Pergola</option>
+              <option value="patio">Patio</option>
+            </select>
+          </div>
+          <div>
+            <label>Material Tier</label>
+            <select id="tier">
+              <option value="good">Good</option>
+              <option value="better">Better</option>
+              <option value="best">Best</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row3">
+          <div>
+            <label>Length (ft)</label>
+            <input id="len" type="number" min="1" step="0.5" value="20" />
+          </div>
+          <div>
+            <label>Width (ft)</label>
+            <input id="wid" type="number" min="1" step="0.5" value="12" />
+          </div>
+          <div>
+            <label>Height (ft)</label>
+            <input id="hgt" type="number" min="0" step="0.5" value="0" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Stairs</label>
+            <select id="stairs">
+              <option value="none">None</option>
+              <option value="one">One Run</option>
+              <option value="two">Two Runs</option>
+            </select>
+          </div>
+          <div>
+            <label>Railing (Linear Ft)</label>
+            <input id="railLf" type="number" min="0" step="1" value="30" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Zip (for contact only)</label>
+            <input id="zip" placeholder="e.g., 98383" />
+          </div>
+          <div>
+            <label>Contact Email</label>
+            <input id="email" type="email" placeholder="you@example.com" />
+          </div>
+        </div>
+
+        <div class="foot" style="margin-top:12px">
+          <button class="btn" id="calc">Recalculate</button>
+          <button class="btn ghost" id="reset">Reset</button>
+        </div>
+        <p class="notice" style="margin-top:10px">
+          This Lite version runs fully in your browser (no server). Numbers are placeholders; we’ll wire in your full logic next.
+        </p>
+      </div>
+
+      <!-- Output -->
+      <div class="card">
+        <h2>Your Quick Quote</h2>
+        <div id="result" class="total">$0</div>
+        <div class="line"><span>Area (sqft)</span><span id="sqft">—</span></div>
+        <div class="line"><span>Base</span><span id="base">$0</span></div>
+        <div class="line"><span>Stairs</span><span id="stairsCost">$0</span></div>
+        <div class="line"><span>Railing</span><span id="railCost">$0</span></div>
+        <div class="line"><span>Height Adder</span><span id="heightAdder">$0</span></div>
+        <div class="hr"></div>
+        <div class="line"><span>Overhead (5%)</span><span id="overhead">$0</span></div>
+        <div class="line"><span>Profit (15%)</span><span id="profit">$0</span></div>
+
+        <div class="hr"></div>
+        <div class="foot">
+          <button class="btn primary" id="cta">Message Us for a Site Visit</button>
+          <button class="btn" id="copy">Copy Quote</button>
+        </div>
+        <p class="notice" style="margin-top:10px">
+          Estimates are rough until we verify site conditions, code requirements, utilities, access, and selections.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ======== CONFIG (placeholder pricing you can edit) ========
+    const BASE = {
+      deck:   { good: 28, better: 36, best: 48 },   // $/sqft
+      pergola:{ good: 35, better: 45, best: 60 },
+      patio:  { good: 20, better: 28, best: 38 }
+    };
+    const STAIR = { none: 0, one: 1800, two: 3200 };  // $ per run (placeholder)
+    const RAIL  = 110; // $/lf (placeholder)
+
+    // ======== Helpers ========
+    const $ = (id) => document.getElementById(id);
+    const money = (n) => (isFinite(n) ? n : 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    const num = (v, d=0) => { const n = parseFloat(v); return isFinite(n) ? n : d; };
+
+    function calc() {
+      const t = $('projType').value;
+      const tier = $('tier').value;
+      const L = num($('len').value, 0);
+      const W = num($('wid').value, 0);
+      const H = num($('hgt').value, 0);
+      const stairs = $('stairs').value;
+      const railLf = Math.max(0, num($('railLf').value, 0));
+
+      const sqft = Math.max(0, L * W);
+      const base = (BASE[t]?.[tier] ?? 0) * sqft;
+      const stairsCost = STAIR[stairs] ?? 0;
+      const railCost = railLf * RAIL;
+
+      // Simple example: height > 3ft → +8% of base (placeholder)
+      const heightAdder = H > 3 ? 0.08 * base : 0;
+
+      const subtotal = base + stairsCost + railCost + heightAdder;
+      const overhead = 0.05 * subtotal;
+      const profit = 0.15 * (subtotal + overhead);
+      const total = Math.round(subtotal + overhead + profit);
+
+      $('result').textContent = money(total);
+      $('sqft').textContent = Math.round(sqft);
+      $('base').textContent = money(base);
+      $('stairsCost').textContent = money(stairsCost);
+      $('railCost').textContent = money(railCost);
+      $('heightAdder').textContent = money(heightAdder);
+      $('overhead').textContent = money(overhead);
+      $('profit').textContent = money(profit);
+
+      return { t, tier, L, W, H, stairs, railLf, sqft, base, stairsCost, railCost, heightAdder, overhead, profit, total };
+    }
+
+    function copyQuote() {
+      const r = calc();
+      const lines = [
+        'Big Bad Builder — Outdoor Living Estimator (Lite Public v0.9)',
+        `Project: ${r.t} (${r.tier})`,
+        `Size: ${r.L}ft × ${r.W}ft (${r.sqft} sqft), Height: ${r.H}ft`,
+        `Stairs: ${r.stairs}, Railing: ${r.railLf} lf`,
+        `Base: ${money(r.base)}`,
+        `Stairs: ${money(r.stairsCost)}, Railing: ${money(r.railCost)}, Height Adder: ${money(r.heightAdder)}`,
+        `Overhead: ${money(r.overhead)}, Profit: ${money(r.profit)}`,
+        `Estimated Total: ${money(r.total)} (subject to site verification)`,
+      ];
+      navigator.clipboard.writeText(lines.join('\n')).then(()=>{
+        alert('Quote copied to clipboard.');
+      }).catch(()=>{ alert('Could not copy.'); });
+    }
+
+    function copyLink() {
+      navigator.clipboard.writeText(location.href).then(()=>{
+        const btn = $('copyLinkBtn'); const t = btn.textContent;
+        btn.textContent = 'Link Copied'; setTimeout(()=>btn.textContent=t, 1400);
+      });
+    }
+
+    // Hook up events
+    ['projType','tier','len','wid','hgt','stairs','railLf'].forEach(id=>{
+      $(id).addEventListener('input', calc);
+      $(id).addEventListener('change', calc);
+    });
+    $('calc').addEventListener('click', calc);
+    $('reset').addEventListener('click', ()=>{
+      $('projType').value='deck';
+      $('tier').value='good';
+      $('len').value=20; $('wid').value=12; $('hgt').value=0;
+      $('stairs').value='none'; $('railLf').value=30;
+      $('zip').value=''; $('email').value='';
+      calc();
+    });
+    $('copy').addEventListener('click', copyQuote);
+    $('copyLinkBtn').addEventListener('click', copyLink);
+    $('cta').addEventListener('click', ()=>{
+      // Replace with your Conversations or mailto link as desired:
+      const email = $('email').value || '';
+      const subject = encodeURIComponent('Outdoor Living Quote Request');
+      const body = encodeURIComponent(`Hi Big Bad Builder,\n\nI’d like a site visit based on my Quick Quote.\n\n${copyQuote.toString() && ''}`);
+      // If you use GoDaddy Conversations link, replace this:
+      window.location.href = `mailto:sales@bigbadbuilder.com?subject=${subject}&body=${body}`;
+    });
+
+    // Initial calc
+    calc();
+  </script>
+</body>
+</html>

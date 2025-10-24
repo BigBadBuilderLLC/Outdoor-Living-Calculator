@@ -654,5 +654,59 @@ document.addEventListener('DOMContentLoaded', function(){
   $('#copyYear').textContent = new Date().getFullYear();
 });
 </script>
+  <!-- Big Bad Builder — Instant-Quote FULL HEIGHT -->
+<div id="bbb-full-est" style="width:100%;height:100dvh;margin:0;padding:0;overflow:hidden;">
+  <iframe
+    src="https://bigbadbuilderllc.github.io/Outdoor-Living-Calculator/"
+    style="display:block;width:100%;height:100%;border:0;overflow:hidden;"
+    loading="lazy"
+  ></iframe>
+</div>
+
+<script>
+/* Force GoDaddy wrappers to full viewport height (works on desktop + mobile) */
+(function forceFullHeight(rootId){
+  var root = document.getElementById(rootId);
+  if(!root) return;
+
+  function vh() {
+    // Use VisualViewport if available (mobile address bar safe)
+    var vv = window.visualViewport;
+    return Math.max( (vv ? vv.height : window.innerHeight) || 0, document.documentElement.clientHeight || 0 );
+  }
+
+  function setHeights(){
+    var h = vh();
+    // our container
+    root.style.height = h + 'px';
+    root.style.minHeight = h + 'px';
+    root.style.margin = '0';
+    root.style.padding = '0';
+    root.style.overflow = 'hidden';
+
+    // climb up GoDaddy wrappers and open them up
+    var p = root.parentElement, hops = 0;
+    while (p && hops < 8) {
+      try {
+        p.style.height = h + 'px';
+        p.style.minHeight = h + 'px';
+        p.style.maxHeight = 'none';
+        p.style.overflow = 'visible';
+        p.style.margin = '0';
+        p.style.padding = '0';
+      } catch(e){}
+      p = p.parentElement; hops++;
+    }
+  }
+
+  setHeights();
+  window.addEventListener('resize', setHeights);
+  (window.visualViewport || window).addEventListener('resize', setHeights);
+
+  // if GoDaddy mutates DOM after load, re-apply
+  new MutationObserver(setHeights).observe(document.body, {subtree:true, childList:true, attributes:true});
+})('bbb-full-est');
+</script>
+
 </body>
 </html>
